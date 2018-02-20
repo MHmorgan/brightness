@@ -54,8 +54,6 @@ main(int argc, char const* argv[])
         if ( val < min_val ) val = min_val;
         if ( val > max_val ) val = max_val;
 
-        printf("val %d diff %d min %d max %d\n", val, diff, min_val, max_val);
-
         if ( write_val(valFileName, val) )
                 fatal("failed writing new brightness value");
         return 0;
