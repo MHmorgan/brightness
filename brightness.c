@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <fcntl.h>
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,11 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-char* maxFileName = "/sys/class/backlight/intel_backlight/max_brightness";
-char* valFileName = "/sys/class/backlight/intel_backlight/brightness";
-
-#define eq_dec(str) !strncmp(str, "dec", 3)
-#define eq_inc(str) !strncmp(str, "inc", 3)
+//#define DEBUG*
 
 /* convenience function calling perror and exit */
 void fatal(char*);
@@ -26,33 +23,43 @@ int read_val(char const*);
 /* Writes number to file. Returns 0 if successfull. */
 int write_val(char const*, int);
 
+char* maxFileName = "/sys/class/backlight/intel_backlight/max_brightness";
+char* valFileName = "/sys/class/backlight/intel_backlight/brightness";
+
+#define eq_dec(str) !strncmp(str, "dec", 3)
+#define eq_inc(str) !strncmp(str, "inc", 3)
+
 int
 main(int argc, char const* argv[])
 {
         /* the actual minimum value is always 0. min_val is just a value chosen
            based on personal preferences. */
-        int val, diff, max_val, min_val = 100;
+        int diff, val, max_val, min_val = 100;
 
         if ( geteuid() )
                 print_and_exit("Must run as root!", NULL);
         if ( argc < 2 )
                 print_and_exit(NULL, argv[0]);
 
-        diff = ( argc >= 3 ) ? atoi(argv[2]) : 100;
+        if ( (max_val = read_val(maxFileName)) == -1 )
+                fatal("failed reading max brightness value");
+        if ( (val = read_val(valFileName)) == -1 )
+                fatal("failed reading brightness value");
+
+        diff = ( argc >= 3 ) ? atoi(argv[2]) : 20 * (val / 100);
 
         if ( eq_dec(argv[1]) )
                 diff *= -1;
         else if ( !eq_inc(argv[1]) )
                 print_and_exit("Unknown argument.", argv[0]);
 
-        if ( (max_val = read_val(maxFileName)) == -1 )
-                fatal("failed reading max brightness value");
-        if ( (val = read_val(valFileName)) == -1 )
-                fatal("failed reading brightness value");
-
         val += diff;
         if ( val < min_val ) val = min_val;
         if ( val > max_val ) val = max_val;
+
+        #ifdef DEBUG
+        printf("diff %d val %d max_val %d min_val %d\n", diff, val, max_val, min_val);
+        #endif
 
         if ( write_val(valFileName, val) )
                 fatal("failed writing new brightness value");
