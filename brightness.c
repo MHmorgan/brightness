@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-//#define DEBUG*
+// #define DEBUG*
 
 /* convenience function calling perror and exit */
 void fatal(char*);

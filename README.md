@@ -8,5 +8,5 @@ sudo chmod 4755 brightness
 ```
 
 ### Changelog
-###### v1.1.0
+###### v1.1
  - Default increase and decrease values vary with the current brightness level to make the changes smoother.
