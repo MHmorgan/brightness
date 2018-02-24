@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -g -Wall -Wextra -pedantic
+CFLAGS= -Wall -Wextra -pedantic
 
 all : brightness
 
