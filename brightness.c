@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define DEBUG
+// #define DEBUG
 
 /* convenience function calling perror and exit */
 void fatal(char*);
@@ -129,7 +129,7 @@ print_and_exit(char const* msg, char const* name)
                        "\t%s <val|max>\n"
                        "\t%s set VALUE\n"
                        "\n"
-                       "Commands:\n\n"
+                       "Commands\n\n"
                        "\tinc\tincrease brightness\n"
                        "\tdec\tdecrease brightness\n"
                        "\tset\tset brightness value\n"
