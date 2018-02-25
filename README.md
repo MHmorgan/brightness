@@ -14,6 +14,19 @@ or
 make install
 ```
 
+###### Usage
+```Bash
+brightness <inc|dec> [VALUE]
+brightness <val|max>
+brightness set VALUE
+
+inc     increase brightness
+dec     decrease brightness
+set     set brightness value
+val     print current brightness value
+max     print max brightness value
+```
+
 ## C API
 
 Include brightness.h to use these functions.
@@ -43,3 +56,6 @@ int brt_setp(double val);
 
 ###### v2.0
  - Added header with C library
+
+###### v2.1
+ - Added set, val and max commands 

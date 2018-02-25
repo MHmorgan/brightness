@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-// #define DEBUG*
+#define DEBUG
 
 /* convenience function calling perror and exit */
 void fatal(char*);
@@ -25,8 +25,11 @@ int write_val(char const*, int);
 char* maxFileName = "/sys/class/backlight/intel_backlight/max_brightness";
 char* valFileName = "/sys/class/backlight/intel_backlight/brightness";
 
-#define eq_dec(str) !strncmp(str, "dec", 3)
-#define eq_inc(str) !strncmp(str, "inc", 3)
+#define is_inc(str) !strncmp(str, "inc", 3)
+#define is_dec(str) !strncmp(str, "dec", 3)
+#define is_set(str) !strncmp(str, "set", 3)
+#define is_val(str) !strncmp(str, "val", 3)
+#define is_max(str) !strncmp(str, "max", 3)
 
 int
 main(int argc, char const* argv[])
@@ -47,12 +50,22 @@ main(int argc, char const* argv[])
 
         diff = ( argc >= 3 ) ? atoi(argv[2]) : 20 * (val / 100);
 
-        if ( eq_dec(argv[1]) )
-                diff *= -1;
-        else if ( !eq_inc(argv[1]) )
-                print_and_exit("Unknown argument.", argv[0]);
+        if ( is_val(argv[1]) ) {
+                printf("%d\n", val);
+                exit(EXIT_SUCCESS);
+        } else if ( is_max(argv[1]) ) {
+                printf("%d\n", max_val);
+                exit(EXIT_SUCCESS);
+        } else if ( is_set(argv[1]) && argc >= 3 ) {
+                val = atoi(argv[2]);
+        } else if ( is_dec(argv[1]) ) {
+                val -= diff;
+        } else if ( is_inc(argv[1]) ) {
+                val += diff;
+        } else {
+                print_and_exit("Invalid input.", argv[0]);
+        }
 
-        val += diff;
         if ( val < min_val ) val = min_val;
         if ( val > max_val ) val = max_val;
 
@@ -111,9 +124,20 @@ print_and_exit(char const* msg, char const* name)
         if ( msg != NULL )
                 printf("%s\n", msg);
         if ( name != NULL )
-                printf("Usage\n\n\t%s <inc|dec> [value]\n\n", name);
+                printf("Usage\n\n"
+                       "\t%s <inc|dec> [VALUE]\n"
+                       "\t%s <val|max>\n"
+                       "\t%s set VALUE\n"
+                       "\n"
+                       "Commands:\n\n"
+                       "\tinc\tincrease brightness\n"
+                       "\tdec\tdecrease brightness\n"
+                       "\tset\tset brightness value\n"
+                       "\tval\tprint current brightness value\n"
+                       "\tmax\tprint max brightness value\n"
+                       "\n", name, name, name);
         exit(0);
-}
+} /* print_and_exit */
 
 void
 fatal(char* msg)
