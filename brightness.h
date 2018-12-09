@@ -23,15 +23,19 @@ brt_val()
         char buf[BUF_SIZE];
 
         if ( (fd = open(valFileName, O_RDONLY)) == -1 )
-                return -1;
+		goto out0;
 
         if ( read(fd, (void*)buf, BUF_SIZE) == -1 )
-                return -1;
+		goto out1;
 
-        if ( close(fd) )
-                return -1;
+        if ( close(fd) == -1 )
+		goto out0;
 
         return atoi(buf);
+out1:
+	close(fd);
+out0:
+	return -1;
 }
 
 /* Returns the maximum brightness value. Returns -1 on failure */
